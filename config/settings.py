@@ -27,6 +27,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'drf_yasg',
     'django_celery_beat',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -37,6 +38,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware'
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -145,3 +147,14 @@ EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 
 SERVER_EMAIL = EMAIL_HOST_USER
 DEFAULT_FORM_EMAIL = EMAIL_HOST_USER
+
+# Настройки CORS
+CORS_ALLOWED_ORIGINS = [
+    '<http://localhost:8000>',
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    '<http://localhost:8000>',
+]
+
+CORS_ALLOW_ALL_ORIGINS = False
