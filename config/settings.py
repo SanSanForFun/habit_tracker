@@ -103,8 +103,10 @@ AUTH_USER_MODEL = 'users.User'
 
 # Настройки JWT-токенов
 REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 5,
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
@@ -116,7 +118,7 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
 }
-
+# Celery
 # URL-адрес брокера сообщений
 CELERY_BROKER_URL = 'redis://localhost:6379/0'
 CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
@@ -137,24 +139,13 @@ CELERY_BEAT_SCHEDULE = {
     },
 }
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.yandex.ru'
-EMAIL_PORT = 465
-EMAIL_USE_TLS = False
-EMAIL_USE_SSL = True
-EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
-
-SERVER_EMAIL = EMAIL_HOST_USER
-DEFAULT_FORM_EMAIL = EMAIL_HOST_USER
-
 # Настройки CORS
 CORS_ALLOWED_ORIGINS = [
-    '<http://localhost:8000>',
+    'http://127.0.0.1:8000',
 ]
 
 CSRF_TRUSTED_ORIGINS = [
-    '<http://localhost:8000>',
+    'http://127.0.0.1:8000',
 ]
 
 CORS_ALLOW_ALL_ORIGINS = False
