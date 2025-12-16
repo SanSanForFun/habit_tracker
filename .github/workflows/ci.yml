@@ -3,6 +3,23 @@ name: Django CI
 on: [ push, pull_request ]
 
 jobs:
+  db:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: djz89qdj
+          POSTGRES_DB: habit
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
   lint:
     runs-on: ubuntu-latest
     steps:
