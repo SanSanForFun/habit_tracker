@@ -13,10 +13,9 @@ services:
       - redis
     env_file:
       - ./.env
-      -
+
   nginx:
-    build:
-      context: ./nginx
+    image: nginx
     ports:
       - "80:80"
     volumes:
