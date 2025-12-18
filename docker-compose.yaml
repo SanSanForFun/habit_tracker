@@ -6,8 +6,8 @@ services:
     volumes:
       - .:/app
       - static_volume:/app/staticfiles
-    expose:
-      - "8000"
+    ports:
+      - "8000:8000"
     depends_on:
       - db
       - redis
@@ -28,6 +28,10 @@ services:
     image: postgres:17
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-habit}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-djz89qdj}
     env_file:
       - ./.env
     healthcheck:
