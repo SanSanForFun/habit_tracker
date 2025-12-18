@@ -1,36 +1,31 @@
-from datetime import datetime, timedelta
-
+from datetime import datetime
 from celery import shared_task
-from django.core.mail import send_mail
-from django_filters.conf import settings
-
-from online.models import Course
-from users.models import User
+from habit.models import Habit
+from habit.tgAPI import send_telegram_message
 
 
 @shared_task
-def send_info(course_id):
-    """ Отправка письма на email """
-    course = Course.objects.get(id=course_id)  # Получаем курс
-    recipients = [sub.user for sub in course.subscribers.all()]  # Получаем всех подписчиков курса
-
-    for recipient in recipients:
-        send_mail(
-            subject='Обновление курса',
-            message=f'Курс "{course.title}" был обновлен.',
-            from_email=settings.EMAIL_HOST_USER,
-            recipient_list=[recipient.email],
-            fail_silently=False,
-        )
+def send_remind(habit_id):
+    try:
+        habit = Habit.objects.get(id=habit_id)
+        message = f'Я буду {habit.action} в {habit.time} в {habit.place}'
+        send_telegram_message(message)
+    except Habit.DoesNotExist:
+        print(f'Привычка {habit_id} не найдена')
+    except Exception as e:
+        print(f'Ошибка при отправке напоминания: {e}')
 
 
 @shared_task
-def kik_user(user_id):
-    """ Блокировка пользователя """
-    date_month_ago = datetime.now() - timedelta(days=30)
-    inactive_users = User.objects.filter(last_login=date_month_ago,
-                                         is_active=True)  # Получаем юзера, который не заходил больше месяца
+def schedule_reminder():
+    now = datetime.now()
+    current_time = now.strftime('%H:%M')
+    current_weekday = now.weekday()
 
-    for user in inactive_users:
-        user.is_active = False
-        user.save()
+    habits = Habit.objects.filter(time=current_time)
+
+    for habit in habits:
+        if habit.periodicity and (current_weekday % habit.periodicity != 0):
+            continue
+
+        send_remind.delay(habit.id)
