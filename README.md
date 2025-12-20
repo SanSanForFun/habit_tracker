@@ -29,11 +29,84 @@
 При внесении изменений в проект и отправки изменений в репозиторий 
 проект автоматически проводит процедуру деплоя на сервер.
 
-После успешного деплоя веб приложение будет доступно по адресу на локальном ПК:
+## Запуск проекта локально
 
+1. Клонируйте репозиторий:
+    ```bash
+    git clone https://github.com/SanSanForFun/habit_tracker.git
+    cd habit_tracker
+   
+2. Устанавливаем зависимости:
+    ```bash
+    pip install -r requirements.txt
+   
+3. Создайте .env файл и укажите переменные окружения.
+
+4. Запустите миграции:
+   ```bash
+   python manage.py migrate
+
+5. Запустите сервер.
+    ```bash
+   python manage.py runserver
+   
+6. Приложение будет доступно по адресу:
     http://127.0.0.1:8000
 
-Так же оно доступно на удаленном сервере по адресу:
+## Запуск проекта на удалённом сервере
 
-    http://158.160.156.220
+1. Подключитесь к серверу по SSH:
+   ```bash
+   ssh user@your-server-ip
+   
+2. Клонируйте репозиторий:
+    ```bash
+   git clone https://github.com/ваш-репозиторий.git
+   cd ваш-репозиторий
 
+3. Установите Docker и Docker Compose.
+
+4. Запустите проект.
+    ```bash
+   docker-compose up --build
+
+5. Приложение будет доступно по адресу: 
+   http://your-server-ip
+
+
+## Настройка сервера и CI/CD
+
+### Настройка сервера
+
+1. Установите Docker и Docker Compose на сервере.
+2. Скопируйте `docker-compose.yml` и `.env` на сервер.
+3. Запустите приложение:
+   ```bash
+   docker-compose up -d
+   
+Используется GitHub Actions для автоматического деплоя на сервер при пуше в main ветку.
+
+Файл .github/workflows/deploy.yml:
+   ```bash
+   name: Deploy to Server
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.KEY }}
+          script: |
+            cd /path/to/your/app
+            git pull origin main
+            docker-compose down
+            docker-compose up --build -d
